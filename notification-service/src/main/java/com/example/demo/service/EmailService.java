@@ -13,20 +13,19 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public void sendEmail(String to, String subject, String message) {
+    public void sendEmail(String to, String subject, String body) {
+        try {
+            SimpleMailMessage mail = new SimpleMailMessage();
+            mail.setFrom("thakurritika361@gmail.com");
+            mail.setTo(to);
+            mail.setSubject(subject);
+            mail.setText(body);
 
-        String formattedMessage =
-                "🚚 Delivery Update\n\n" +
-                message +
-                "\n\nThank you for using SmartCourier 💙";
-
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(to);
-        mail.setSubject(subject);
-        mail.setText(formattedMessage);
-
-        mailSender.send(mail);
-
-        System.out.println("✅ EMAIL SENT TO: " + to);
+            System.out.println("📤 ATTEMPTING TO SEND EMAIL TO: " + to);
+            mailSender.send(mail);
+            System.out.println("✅ EMAIL SENT SUCCESSFULLY TO: " + to);
+        } catch (Exception e) {
+            System.err.println("❌ FAILED TO SEND EMAIL TO: " + to + " | Error: " + e.getMessage());
+        }
     }
 }

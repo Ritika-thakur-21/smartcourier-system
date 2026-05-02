@@ -13,7 +13,7 @@ services:
     networks:
       - smartcourier_net
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -31,7 +31,7 @@ services:
     networks:
       - smartcourier_net
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -46,7 +46,7 @@ services:
     networks:
       - smartcourier_net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:9411/health || exit 1"]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:9411/health || exit 1" ]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -62,7 +62,7 @@ services:
     networks:
       - smartcourier_net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health || exit 1" ]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -75,7 +75,7 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - C:/Users/thaku/smartcourier-config:/config
+      - ./smartcourier-config:/config
     environment:
       - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:///config
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
@@ -85,7 +85,7 @@ services:
     networks:
       - smartcourier_net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8888/actuator/health || exit 1" ]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -99,14 +99,22 @@ services:
       - "8081:8081"
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/auth_db?createDatabaseIfNotExist=true
+      - EUREKA_HOST=eureka-server
+      - MYSQL_HOST=mysql
+      - RABBITMQ_HOST=rabbitmq
+      - ZIPKIN_HOST=zipkin
+      - TZ=Asia/Kolkata
+      - JAVA_OPTS=-Duser.timezone=Asia/Kolkata
     depends_on:
       config-server:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
       mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      zipkin:
         condition: service_healthy
     networks:
       - smartcourier_net
@@ -122,9 +130,11 @@ services:
       - ./admin-service/.env:/app/.env
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/admin_db?createDatabaseIfNotExist=true
-      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+      - EUREKA_HOST=eureka-server
+      - MYSQL_HOST=mysql
+      - ZIPKIN_HOST=zipkin
+      - TZ=Asia/Kolkata
+      - JAVA_OPTS=-Duser.timezone=Asia/Kolkata
     depends_on:
       config-server:
         condition: service_healthy
@@ -148,10 +158,12 @@ services:
       - ./delivery-service/.env:/app/.env
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/delivery_db?createDatabaseIfNotExist=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+      - EUREKA_HOST=eureka-server
+      - MYSQL_HOST=mysql
+      - RABBITMQ_HOST=rabbitmq
+      - ZIPKIN_HOST=zipkin
+      - TZ=Asia/Kolkata
+      - JAVA_OPTS=-Duser.timezone=Asia/Kolkata
     depends_on:
       config-server:
         condition: service_healthy
@@ -177,10 +189,12 @@ services:
       - ./tracking-service/.env:/app/.env
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/tracking_db?createDatabaseIfNotExist=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+      - EUREKA_HOST=eureka-server
+      - MYSQL_HOST=mysql
+      - RABBITMQ_HOST=rabbitmq
+      - ZIPKIN_HOST=zipkin
+      - TZ=Asia/Kolkata
+      - JAVA_OPTS=-Duser.timezone=Asia/Kolkata
     depends_on:
       config-server:
         condition: service_healthy
@@ -202,9 +216,12 @@ services:
       - "8086:8086"
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+      - EUREKA_HOST=eureka-server
+      - RABBITMQ_HOST=rabbitmq
+      - ZIPKIN_HOST=zipkin
+      - SPRING_MAIL_PASSWORD=oksuegkgrjgjouac
+      - TZ=Asia/Kolkata
+      - JAVA_OPTS=-Duser.timezone=Asia/Kolkata
     depends_on:
       config-server:
         condition: service_healthy
@@ -222,10 +239,16 @@ services:
     container_name: api-gateway
     ports:
       - "8080:8080"
+    env_file:
+      - ./admin-service/.env
+    volumes:
+      - ./admin-service/.env:/app/.env
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+      - EUREKA_HOST=eureka-server
+      - ZIPKIN_HOST=zipkin
+      - TZ=Asia/Kolkata
+      - JAVA_OPTS=-Duser.timezone=Asia/Kolkata
     depends_on:
       config-server:
         condition: service_healthy

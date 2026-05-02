@@ -1,14 +1,19 @@
 package com.example.demo.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "Login request body")
 public class LoginRequest {
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be a valid email address (e.g. user@example.com)")
     @Schema(description = "Email address", example = "raj@example.com")
     private String email;
 
-    @Schema(description = "Password", example = "password123")
+    @NotBlank(message = "Password is required")
+    @Schema(description = "Password", example = "Raj@1234")
     private String password;
 
     // Getters

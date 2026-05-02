@@ -5,6 +5,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfiguration;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -14,26 +18,37 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
-                // Let JwtUtil GlobalFilter handle JWT validation.
-                // SecurityConfig only declares which paths are public.
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(
                                 "/auth/**",                  // auth-service direct
-                                "/gateway/auth/**",          // auth-service via gateway
                                 "/v3/api-docs/**",           // swagger docs direct
-                                "/gateway/*/v3/api-docs",    // swagger docs via gateway (e.g. /gateway/admin/v3/api-docs)
-                                "/gateway/*/v3/api-docs/**",
+                                "/*/v3/api-docs/**",         // swagger docs for services
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/webjars/**",
-                                "/fallback/**"
+                                "/fallback/**",
+                                "/actuator/**"
                         ).permitAll()
                         .anyExchange().permitAll()           // JWT enforcement handled by JwtUtil GlobalFilter
                 )
                 .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(Arrays.asList("*")); // Allow all origins for development
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }

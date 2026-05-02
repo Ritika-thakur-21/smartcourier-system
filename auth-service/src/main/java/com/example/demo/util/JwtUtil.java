@@ -19,7 +19,6 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    // 🔥 Generate Token
     public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
@@ -30,7 +29,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // 🔥 Extract Claims
     public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
@@ -39,22 +37,18 @@ public class JwtUtil {
                 .getBody();
     }
 
-    // 🔥 Extract Email (username)
     public String extractEmail(String token) {
         return extractClaims(token).getSubject();
     }
 
-    // 🔥 Extract Role
     public String extractRole(String token) {
         return extractClaims(token).get("role", String.class);
     }
 
-    // 🔥 Check Expiration
     public boolean isTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
     }
 
-    // 🔥 Final Validation
     public boolean validateToken(String token) {
         try {
             return !isTokenExpired(token);

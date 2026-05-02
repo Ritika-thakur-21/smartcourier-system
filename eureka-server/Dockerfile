@@ -1,14 +1,14 @@
-# Use lightweight Java image
-FROM eclipse-temurin:17-jdk-alpine
-
-# Working directory set
+# Stage 1: Build
+FROM maven:3.8.4-openjdk-17-slim AS build
 WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy jar file
-COPY target/eureka-server-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose port (Eureka default)
+# Stage 2: Runtime
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/target/eureka-server-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8761
-
-# Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]

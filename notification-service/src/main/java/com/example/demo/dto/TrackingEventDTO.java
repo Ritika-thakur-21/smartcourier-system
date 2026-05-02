@@ -7,46 +7,33 @@ public class TrackingEventDTO {
     private String location;
     private String remarks;
     private String email;
+    private String recipientType; // "SENDER" or "RECEIVER"
+    private String senderName;
+    private String receiverName;
 
     public TrackingEventDTO() {}
 
-    public String getTrackingNumber() {
-        return trackingNumber;
-    }
+    public String getTrackingNumber() { return trackingNumber; }
+    public void setTrackingNumber(String trackingNumber) { this.trackingNumber = trackingNumber; }
 
-    public void setTrackingNumber(String trackingNumber) {
-        this.trackingNumber = trackingNumber;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public String getStatus() {
-        return status;
-    }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
 
-    public String getLocation() {
-        return location;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public String getRecipientType() { return recipientType; }
+    public void setRecipientType(String recipientType) { this.recipientType = recipientType; }
 
-    public String getRemarks() {
-        return remarks;
-    }
+    public String getSenderName() { return senderName; }
+    public void setSenderName(String senderName) { this.senderName = senderName; }
 
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getReceiverName() { return receiverName; }
+    public void setReceiverName(String receiverName) { this.receiverName = receiverName; }
 }

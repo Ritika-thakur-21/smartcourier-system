@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.*;
 import com.example.demo.entity.Document;
 import com.example.demo.repository.DocumentRepository;
+import com.example.demo.exception.*;
 import com.example.demo.service.TrackingService;
 
 import org.springframework.http.HttpHeaders;
@@ -26,7 +27,6 @@ public class TrackingController {
         this.documentRepository = documentRepository;
     }
 
-    // ✅ Upload Document (🔥 FIXED FOR SWAGGER)
     @PostMapping(value = "/documents/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentResponse> uploadDocument(
             @RequestParam("file") MultipartFile file,
@@ -35,7 +35,6 @@ public class TrackingController {
         return ResponseEntity.ok(trackingService.saveDocument(file, deliveryId));
     }
 
-    // ✅ Get Documents
     @GetMapping("/documents/{deliveryId}")
     public ResponseEntity<List<DocumentResponse>> getDocuments(
             @PathVariable Long deliveryId) {
@@ -43,12 +42,11 @@ public class TrackingController {
         return ResponseEntity.ok(trackingService.getDocuments(deliveryId));
     }
 
-    // ✅ Download Document (IMPROVED)
     @GetMapping("/documents/download/{id}")
     public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) {
 
         Document doc = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Document not found"));
+                .orElseThrow(() -> new DocumentNotFoundException("Document not found with ID: " + id));
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
@@ -57,14 +55,12 @@ public class TrackingController {
                 .body(doc.getFileData());
     }
 
-    // ✅ Create Tracking Event
     @PostMapping("/events")
     public ResponseEntity<Void> createEvent(@RequestBody TrackingEventRequest request) {
         trackingService.createEvent(request);
         return ResponseEntity.ok().build();
     }
 
-    // ✅ Track Parcel
     @GetMapping("/{trackingNumber}")
     public ResponseEntity<List<TrackingEventResponse>> track(
             @PathVariable String trackingNumber) {
@@ -72,7 +68,6 @@ public class TrackingController {
         return ResponseEntity.ok(trackingService.getEvents(trackingNumber));
     }
 
-    // ✅ Submit Delivery Proof
     @PostMapping("/proof")
     public ResponseEntity<DeliveryProofResponse> submitProof(
             @RequestParam Long deliveryId,
@@ -89,7 +84,6 @@ public class TrackingController {
         );
     }
 
-    // ✅ Get Delivery Proof
     @GetMapping("/proof/{deliveryId}")
     public ResponseEntity<DeliveryProofResponse> getProof(
             @PathVariable Long deliveryId) {

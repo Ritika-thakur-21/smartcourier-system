@@ -11,7 +11,7 @@ public class RabbitMQConfig {
 
     public static final String EXCHANGE = "tracking_exchange";
     public static final String QUEUE = "tracking_queue";
-    public static final String ROUTING_KEY = "tracking_routing_key";
+    public static final String ROUTING_KEY = "tracking_routing";
 
     @Bean
     public TopicExchange exchange() {

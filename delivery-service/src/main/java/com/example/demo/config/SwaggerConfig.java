@@ -45,7 +45,7 @@ public class SwaggerConfig {
                                 .url("http://localhost:8082")
                                 .description("Direct Service"),
                         new Server()
-                                .url("http://localhost:8080/gateway")
+                                .url("http://localhost:8080")
                                 .description("Via API Gateway")
                 ));
     }

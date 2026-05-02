@@ -49,7 +49,6 @@ class TrackingControllerTest {
                 .build();
     }
 
-    // ✅ UPLOAD DOCUMENT
     @Test
     void testUploadDocument() throws Exception {
 
@@ -69,7 +68,6 @@ class TrackingControllerTest {
                 .andExpect(status().isOk());
     }
 
-    // ✅ GET DOCUMENTS
     @Test
     void testGetDocuments() throws Exception {
 
@@ -80,7 +78,6 @@ class TrackingControllerTest {
                 .andExpect(status().isOk());
     }
 
-    // ✅ DOWNLOAD DOCUMENT
     @Test
     void testDownloadDocument() throws Exception {
 
@@ -98,18 +95,6 @@ class TrackingControllerTest {
                 .andExpect(header().exists("Content-Disposition"));
     }
 
-    // ❌ DOWNLOAD NOT FOUND
-//    @Test
-//    void testDownloadDocument_NotFound() throws Exception {
-//
-//        Mockito.when(documentRepository.findById(1L))
-//                .thenReturn(Optional.empty());
-//
-//        mockMvc.perform(get("/tracking/documents/download/1"))
-//                .andExpect(status().isInternalServerError());
-//    }
-
-    // ✅ CREATE EVENT
     @Test
     void testCreateEvent() throws Exception {
 
@@ -123,7 +108,6 @@ class TrackingControllerTest {
         Mockito.verify(trackingService).createEvent(Mockito.any());
     }
 
-    // ✅ TRACK
     @Test
     void testTrack() throws Exception {
 
@@ -134,7 +118,6 @@ class TrackingControllerTest {
                 .andExpect(status().isOk());
     }
 
-    // ✅ SUBMIT PROOF
     @Test
     void testSubmitProof() throws Exception {
 
@@ -155,7 +138,6 @@ class TrackingControllerTest {
                 .andExpect(status().isOk());
     }
 
-    // ✅ GET PROOF
     @Test
     void testGetProof() throws Exception {
 

@@ -13,6 +13,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -22,14 +26,26 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Name is required")
+    @Pattern(
+        regexp = "^[A-Za-z][A-Za-z ]{1,48}[A-Za-z]$",
+        message = "Name must be 3-50 characters, letters and spaces only"
+    )
     private String name;
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid (e.g. user@example.com)")
     @Column(unique = true, nullable = false)
     private String email;
 
+    @NotBlank(message = "Password is required")
     @Column(nullable = false)
     private String password;
 
+    @Pattern(
+        regexp = "^[6-9]\\d{9}$",
+        message = "Phone must be a valid 10-digit Indian mobile number starting with 6-9"
+    )
     private String phone;
 
     @Enumerated(EnumType.STRING)

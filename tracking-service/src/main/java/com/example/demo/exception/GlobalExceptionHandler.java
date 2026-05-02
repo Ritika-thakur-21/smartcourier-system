@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(TrackingNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleTrackingNotFound(
-            TrackingNotFoundException ex,
+    @ExceptionHandler({TrackingNotFoundException.class, DocumentNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFound(
+            RuntimeException ex,
             HttpServletRequest request) {
 
         return new ResponseEntity<>(

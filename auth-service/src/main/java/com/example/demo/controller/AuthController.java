@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class AuthController {
     @Operation(summary = "Register new user (always USER role)")
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> signup(
-            @RequestBody SignupRequest request) {
+            @Valid @RequestBody SignupRequest request) {
 
         // 🔥 Role ignore karo (security)
         request.setRole(null);
@@ -46,7 +47,7 @@ public class AuthController {
     @Operation(summary = "Login user and get JWT token")
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(
-            @RequestBody LoginRequest request) {
+            @Valid @RequestBody LoginRequest request) {
 
         return ResponseEntity.ok(authService.login(request));
     }

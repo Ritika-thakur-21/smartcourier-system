@@ -15,5 +15,6 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     Optional<Delivery> findByTrackingNumber(String trackingNumber);
 
     List<Delivery> findByStatus(DeliveryStatus status);
-//    List<Delivery> findByUserName(String userName);
+
+    List<Delivery> findByCreatedAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
 }

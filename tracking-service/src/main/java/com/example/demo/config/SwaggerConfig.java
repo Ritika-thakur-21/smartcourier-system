@@ -21,7 +21,6 @@ public class SwaggerConfig {
     public OpenAPI trackingServiceOpenAPI() {
         return new OpenAPI()
 
-                // 🔒 JWT AUTH ADD
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
 
                 .components(new io.swagger.v3.oas.models.Components()
@@ -45,7 +44,7 @@ public class SwaggerConfig {
                                 .url("http://localhost:8083")
                                 .description("Direct Service"),
                         new Server()
-                                .url("http://localhost:8080/gateway")
+                                .url("http://localhost:8080")
                                 .description("Via API Gateway")
                 ));
     }

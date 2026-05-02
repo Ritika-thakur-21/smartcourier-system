@@ -1,0 +1,1 @@
+import{a}from"./axios-98_B2tFR.js";const i=()=>a.get("/admin/dashboard"),r=e=>a.get("/admin/deliveries",{params:{}}),n=e=>a.get(`/admin/deliveries/${e}`),d=e=>a.get(`/admin/tracking/${e}`),o=(e,s)=>a.put(`/admin/deliveries/${e}/resolve`,s),g=(e,s)=>a.get("/admin/reports",{params:{from:e,to:s}});export{r as a,n as b,d as c,g as d,i as g,o as r};

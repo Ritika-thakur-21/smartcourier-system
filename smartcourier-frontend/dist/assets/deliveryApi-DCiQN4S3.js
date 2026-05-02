@@ -1,0 +1,1 @@
+import{a as s}from"./axios-98_B2tFR.js";const a=e=>s.post("/deliveries",e),r=()=>s.get("/deliveries/my"),l=e=>s.get(`/deliveries/${e}`),o=(e,t)=>s.put(`/deliveries/${e}/status`,null,{params:{status:t}});export{l as a,a as c,r as g,o as u};

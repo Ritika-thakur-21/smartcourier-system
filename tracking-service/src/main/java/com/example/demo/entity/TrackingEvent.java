@@ -20,6 +20,8 @@ public class TrackingEvent {
     private String trackingNumber;
     private String status;
     private String location;
+    private Double latitude;
+    private Double longitude;
     private String remarks;
     private LocalDateTime eventTime;
 
@@ -33,6 +35,8 @@ public class TrackingEvent {
     public String getTrackingNumber() { return trackingNumber; }
     public String getStatus() { return status; }
     public String getLocation() { return location; }
+    public Double getLatitude() { return latitude; }
+    public Double getLongitude() { return longitude; }
     public String getRemarks() { return remarks; }
     public LocalDateTime getEventTime() { return eventTime; }
 
@@ -41,6 +45,8 @@ public class TrackingEvent {
     public void setTrackingNumber(String trackingNumber) { this.trackingNumber = trackingNumber; }
     public void setStatus(String status) { this.status = status; }
     public void setLocation(String location) { this.location = location; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
     public void setRemarks(String remarks) { this.remarks = remarks; }
     public void setEventTime(LocalDateTime eventTime) { this.eventTime = eventTime; }
 }

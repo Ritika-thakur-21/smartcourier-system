@@ -18,6 +18,12 @@ public class TrackingEventResponse {
     @Schema(description = "Location at this event", example = "Mumbai")
     private String location;
 
+    @Schema(description = "Latitude of location", example = "19.0760")
+    private Double latitude;
+
+    @Schema(description = "Longitude of location", example = "72.8777")
+    private Double longitude;
+
     @Schema(description = "Remarks", example = "Parcel booked successfully")
     private String remarks;
 
@@ -29,6 +35,8 @@ public class TrackingEventResponse {
     public String getTrackingNumber() { return trackingNumber; }
     public String getStatus() { return status; }
     public String getLocation() { return location; }
+    public Double getLatitude() { return latitude; }
+    public Double getLongitude() { return longitude; }
     public String getRemarks() { return remarks; }
     public LocalDateTime getEventTime() { return eventTime; }
 
@@ -37,6 +45,8 @@ public class TrackingEventResponse {
     public void setTrackingNumber(String trackingNumber) { this.trackingNumber = trackingNumber; }
     public void setStatus(String status) { this.status = status; }
     public void setLocation(String location) { this.location = location; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
     public void setRemarks(String remarks) { this.remarks = remarks; }
     public void setEventTime(LocalDateTime eventTime) { this.eventTime = eventTime; }
 }

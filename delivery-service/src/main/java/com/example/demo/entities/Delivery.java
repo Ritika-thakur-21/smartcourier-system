@@ -27,7 +27,8 @@ public class Delivery {
     @Column(unique = true, nullable = false)
     private String trackingNumber;
 
-    private String customerEmail;
+    private String customerEmail;  // sender email
+    private String receiverEmail;  // receiver email
     private String username; 
 
     @Enumerated(EnumType.STRING)
@@ -83,6 +84,14 @@ public class Delivery {
 
 	public void setCustomerEmail(String customerEmail) {
 		this.customerEmail = customerEmail;
+	}
+
+	public String getReceiverEmail() {
+		return receiverEmail;
+	}
+
+	public void setReceiverEmail(String receiverEmail) {
+		this.receiverEmail = receiverEmail;
 	}
 
 	public DeliveryStatus getStatus() {

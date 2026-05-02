@@ -39,7 +39,6 @@ class TrackingServiceTest {
     @InjectMocks
     private TrackingService trackingService;
 
-    // ✅ CREATE EVENT
     @Test
     void testCreateEvent() {
 
@@ -55,11 +54,10 @@ class TrackingServiceTest {
         verify(rabbitTemplate).convertAndSend(
                 eq("tracking_exchange"),
                 eq("tracking_routing"),
-                any(Object.class)   // 🔥 IMPORTANT
+                any(Object.class)   
         );
     }
 
-    // ✅ GET EVENTS
     @Test
     void testGetEvents() {
 
@@ -79,7 +77,6 @@ class TrackingServiceTest {
         assertEquals(1, result.size());
     }
 
-    // ✅ SAVE DOCUMENT
     @Test
     void testSaveDocument() throws Exception {
 
@@ -103,7 +100,6 @@ class TrackingServiceTest {
         assertEquals("test.pdf", res.getFileName());
     }
 
-    // ❌ FILE EMPTY
     @Test
     void testSaveDocument_EmptyFile() {
 
@@ -114,7 +110,6 @@ class TrackingServiceTest {
                 trackingService.saveDocument(file, 1L));
     }
 
-    // ✅ GET DOCUMENTS
     @Test
     void testGetDocuments() {
 
@@ -132,7 +127,6 @@ class TrackingServiceTest {
         assertEquals(1, res.size());
     }
 
-    // ✅ SAVE PROOF
     @Test
     void testSaveProof() {
 
@@ -154,7 +148,6 @@ class TrackingServiceTest {
         assertEquals(1L, res.getDeliveryId());
     }
 
-    // ❌ DUPLICATE PROOF
     @Test
     void testSaveProof_Duplicate() {
 
@@ -167,7 +160,6 @@ class TrackingServiceTest {
                 ));
     }
 
-    // ✅ GET PROOF
     @Test
     void testGetProof() {
 
@@ -183,7 +175,6 @@ class TrackingServiceTest {
         assertEquals(1L, res.getDeliveryId());
     }
 
-    // ❌ PROOF NOT FOUND
     @Test
     void testGetProof_NotFound() {
 

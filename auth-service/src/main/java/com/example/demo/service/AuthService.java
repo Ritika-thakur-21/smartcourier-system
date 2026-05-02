@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.*;
 import com.example.demo.entity.User;
@@ -15,21 +16,24 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.util.JwtUtil;
 
 @Service
+@Transactional
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final SignupProducer signupProducer;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtUtil jwtUtil) {
+                       JwtUtil jwtUtil,
+                       SignupProducer signupProducer) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.signupProducer = signupProducer;
     }
 
-    // 🔐 SIGNUP (FIXED - ALWAYS CUSTOMER)
     public UserResponse signup(SignupRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -43,13 +47,16 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
 
-        // 🔥 FORCE ROLE (SECURITY FIX)
         user.setRole(Role.CUSTOMER);
 
-        return mapToResponse(userRepository.save(user));
+        User saved = userRepository.save(user);
+        
+        // 📧 Send Welcome Email
+        signupProducer.sendWelcomeEmail(saved.getEmail(), saved.getName());
+
+        return mapToResponse(saved);
     }
 
-    // 🔐 LOGIN
     public JwtResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
@@ -74,7 +81,6 @@ public class AuthService {
         );
     }
 
-    // 👥 GET ALL USERS
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -82,7 +88,6 @@ public class AuthService {
                 .collect(Collectors.toList());
     }
 
-    // 👤 GET USER BY ID
     public UserResponse getUserById(Long id) {
         return userRepository.findById(id)
                 .map(this::mapToResponse)
@@ -90,25 +95,22 @@ public class AuthService {
                         new UserNotFoundException("User not found with id: " + id));
     }
 
-    // 🔐 VALIDATE TOKEN (FIXED)
     public boolean validateToken(String token) {
         return jwtUtil.validateToken(token);
     }
 
-    // 👑 MAKE ADMIN (FIXED)
     public boolean makeAdmin(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) return false;
 
         User user = optionalUser.get();
-        user.setRole(Role.ADMIN); // 🔥 ENUM FIX
+        user.setRole(Role.ADMIN); 
         userRepository.save(user);
 
         return true;
     }
 
-    // 🔄 MAPPER
     private UserResponse mapToResponse(User user) {
         UserResponse response = new UserResponse();
         response.setId(user.getId());

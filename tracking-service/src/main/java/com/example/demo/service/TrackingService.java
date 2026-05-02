@@ -3,6 +3,9 @@ package com.example.demo.service;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,8 @@ import com.example.demo.repository.*;
 
 @Service
 public class TrackingService {
+
+    private static final Logger log = LoggerFactory.getLogger(TrackingService.class);
 
     private final TrackingEventRepository trackingEventRepository;
     private final DocumentRepository documentRepository;
@@ -31,42 +36,63 @@ public class TrackingService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    // ✅ CREATE EVENT
+    @Transactional
     public void createEvent(TrackingEventRequest request) {
+        log.info(" Received tracking event creation request for tracking number: {}", request.getTrackingNumber());
 
         TrackingEvent event = new TrackingEvent();
         event.setTrackingNumber(request.getTrackingNumber());
         event.setStatus(request.getStatus());
         event.setLocation(request.getLocation());
         event.setRemarks(request.getRemarks());
+        
+        assignCoordinates(event, request.getLatitude(), request.getLongitude());
 
         trackingEventRepository.save(event);
 
-        // 🔥 DTO for notification
         TrackingEventDTO dto = new TrackingEventDTO();
         dto.setTrackingNumber(request.getTrackingNumber());
         dto.setStatus(request.getStatus());
         dto.setLocation(request.getLocation());
         dto.setRemarks(request.getRemarks());
-        dto.setEmail("thakurritika361@gmail.com");
+        dto.setLatitude(event.getLatitude());
+        dto.setLongitude(event.getLongitude());
+        dto.setEmail(request.getEmail());
+        dto.setRecipientType(request.getRecipientType());
+        dto.setSenderName(request.getSenderName());
+        dto.setReceiverName(request.getReceiverName());
 
-        try {
-            System.out.println("🔥 Sending to RabbitMQ: " + dto.getTrackingNumber());
+    }
 
-            rabbitTemplate.convertAndSend(
-                    "tracking_exchange",     // ✅ FIXED
-                    "tracking_routing",      // ✅ FIXED
-                    dto
-            );
-
-            System.out.println("✅ Message sent to RabbitMQ");
-
-        } catch (Exception e) {
-            System.out.println("❌ RabbitMQ ERROR: " + e.getMessage());
+    private void assignCoordinates(TrackingEvent event, Double reqLat, Double reqLng) {
+        if (reqLat != null && reqLng != null) {
+            event.setLatitude(reqLat);
+            event.setLongitude(reqLng);
+            return;
+        }
+        
+        String loc = event.getLocation() != null ? event.getLocation().toLowerCase() : "";
+        if (loc.contains("mumbai")) {
+            event.setLatitude(19.0760);
+            event.setLongitude(72.8777);
+        } else if (loc.contains("delhi")) {
+            event.setLatitude(28.7041);
+            event.setLongitude(77.1025);
+        } else if (loc.contains("bangalore")) {
+            event.setLatitude(12.9716);
+            event.setLongitude(77.5946);
+        } else if (loc.contains("hyderabad")) {
+            event.setLatitude(17.3850);
+            event.setLongitude(78.4867);
+        } else if (loc.contains("chennai")) {
+            event.setLatitude(13.0827);
+            event.setLongitude(80.2707);
+        } else if (loc.contains("kolkata")) {
+            event.setLatitude(22.5726);
+            event.setLongitude(88.3639);
         }
     }
 
-    // ✅ GET EVENTS
     public List<TrackingEventResponse> getEvents(String trackingNumber) {
         return trackingEventRepository
                 .findByTrackingNumberOrderByEventTimeAsc(trackingNumber)
@@ -75,7 +101,6 @@ public class TrackingService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ UPLOAD DOCUMENT
     public DocumentResponse saveDocument(MultipartFile file, Long deliveryId) {
 
         if (file == null || file.isEmpty()) {
@@ -103,7 +128,6 @@ public class TrackingService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ SAVE PROOF
     public DeliveryProofResponse saveProof(Long deliveryId,
                                            String trackingNumber,
                                            String receiverName,
@@ -127,7 +151,6 @@ public class TrackingService {
         return mapToProofResponse(deliveryProofRepository.save(proof));
     }
 
-    // ✅ GET PROOF
     public DeliveryProofResponse getProofByDeliveryId(Long deliveryId) {
 
         List<DeliveryProof> proofs =
@@ -139,8 +162,6 @@ public class TrackingService {
 
         return mapToProofResponse(proofs.get(0));
     }
-
-    // 🔁 MAPPERS
 
     private DocumentResponse mapToDocumentResponse(Document doc) {
         DocumentResponse res = new DocumentResponse();
@@ -158,6 +179,8 @@ public class TrackingService {
         res.setTrackingNumber(event.getTrackingNumber());
         res.setStatus(event.getStatus());
         res.setLocation(event.getLocation());
+        res.setLatitude(event.getLatitude());
+        res.setLongitude(event.getLongitude());
         res.setRemarks(event.getRemarks());
         res.setEventTime(event.getEventTime());
         return res;

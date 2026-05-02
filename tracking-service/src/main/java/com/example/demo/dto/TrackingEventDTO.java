@@ -6,7 +6,12 @@ public class TrackingEventDTO {
     private String status;
     private String location;
     private String remarks;
+    private Double latitude;
+    private Double longitude;
     private String email;
+    private String recipientType;
+    private String senderName;
+    private String receiverName;
 
     public TrackingEventDTO() {}
 
@@ -49,4 +54,19 @@ public class TrackingEventDTO {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getRecipientType() { return recipientType; }
+    public void setRecipientType(String recipientType) { this.recipientType = recipientType; }
+
+    public String getSenderName() { return senderName; }
+    public void setSenderName(String senderName) { this.senderName = senderName; }
+
+    public String getReceiverName() { return receiverName; }
+    public void setReceiverName(String receiverName) { this.receiverName = receiverName; }
+
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
 }
