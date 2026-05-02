@@ -1,0 +1,132 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders: "*"
+            exposedHeaders:
+              - Authorization
+            maxAge: 3600
+
+      routes:
+
+        # ===== SWAGGER ROUTES =====
+        - id: auth-swagger
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/v3/api-docs
+          filters:
+            - RewritePath=/auth/v3/api-docs, /v3/api-docs
+
+        - id: delivery-swagger
+          uri: lb://DELIVERY-SERVICE
+          predicates:
+            - Path=/delivery/v3/api-docs
+          filters:
+            - RewritePath=/delivery/v3/api-docs, /v3/api-docs
+
+        - id: tracking-swagger
+          uri: lb://TRACKING-SERVICE
+          predicates:
+            - Path=/tracking/v3/api-docs
+          filters:
+            - RewritePath=/tracking/v3/api-docs, /v3/api-docs
+
+        - id: admin-swagger
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin/v3/api-docs
+          filters:
+            - RewritePath=/admin/v3/api-docs, /v3/api-docs
+
+
+        # ===== MAIN ROUTES =====
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+
+        - id: delivery-service
+          uri: lb://DELIVERY-SERVICE
+          predicates:
+            - Path=/deliveries/**
+
+        - id: tracking-service
+          uri: lb://TRACKING-SERVICE
+          predicates:
+            - Path=/tracking/**
+
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin/**
+
+
+# ===== SWAGGER AGGREGATION =====
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    urls:
+      - name: AUTH-SERVICE
+        url: /auth/v3/api-docs
+      - name: DELIVERY-SERVICE
+        url: /delivery/v3/api-docs
+      - name: TRACKING-SERVICE
+        url: /tracking/v3/api-docs
+      - name: ADMIN-SERVICE
+        url: /admin/v3/api-docs
+
+
+# ===== JWT =====
+jwt:
+  secret: ${JWT_SECRET:ritika_smartcourier_jwt_secure_key_2026_!@#$}
+
+
+# ===== EUREKA =====
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+
+
+# ===== ACTUATOR + ZIPKIN =====
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://${ZIPKIN_HOST:localhost}:9411/api/v2/spans

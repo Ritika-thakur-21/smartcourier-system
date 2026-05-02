@@ -1,0 +1,83 @@
+server:
+  port: 8082
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: DELIVERY-SERVICE
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/delivery_db?createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:Ritika@123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: 5672
+    username: guest
+    password: guest
+
+# ===== JWT =====
+jwt:
+  secret: ${JWT_SECRET:ritika_smartcourier_jwt_secure_key_2026_!@#$}
+  expiration: 86400000
+
+# ===== SWAGGER =====
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# ===== EUREKA (FIXED) =====
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+# ===== ACTUATOR + ZIPKIN =====
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://${ZIPKIN_HOST:localhost}:9411/api/v2/spans
+
+# ===== FEIGN =====
+feign:
+  circuitbreaker:
+    enabled: true
+
+# ===== RESILIENCE4J =====
+resilience4j:
+  circuitbreaker:
+    instances:
+      TRACKING-SERVICE:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s

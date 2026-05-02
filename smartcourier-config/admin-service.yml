@@ -1,0 +1,80 @@
+server:
+  port: 8084
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: ADMIN-SERVICE
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/admin_db?createDatabaseIfNotExist=true
+    username: root
+    password: Ritika@123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# =======================
+# 🔥 SWAGGER CONFIG
+# =======================
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# =======================
+# 🔑 JWT CONFIG
+# =======================
+jwt:
+  secret: ${JWT_SECRET:ritika_smartcourier_jwt_secure_key_2026_!@#$}
+  expiration: 86400000
+
+# =======================
+# 🔥 FEIGN CONFIG
+# =======================
+feign:
+  circuitbreaker:
+    enabled: true
+
+# =======================
+# 🔥 EUREKA CONFIG (FIXED)
+# =======================
+eureka:
+  client:
+    service-url:
+      # Local run → localhost use karega
+      # Docker run → env variable se override hoga
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+# =======================
+# 🔥 ACTUATOR + TRACING
+# =======================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      # Local → localhost
+      # Docker → ZIPKIN_HOST=zipkin
+      endpoint: http://${ZIPKIN_HOST:localhost}:9411/api/v2/spans
