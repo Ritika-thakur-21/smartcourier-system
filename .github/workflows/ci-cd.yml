@@ -75,19 +75,3 @@ jobs:
         context: ./smartcourier-frontend
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/smartcourier-frontend:latest
-
-  deploy:
-    needs: [build-and-push-backend, build-and-push-frontend]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Deploy to Server via SSH
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          cd /path/to/your/project
-          docker-compose pull
-          docker-compose up -d
