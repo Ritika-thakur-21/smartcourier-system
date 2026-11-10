@@ -5,14 +5,13 @@ spring:
   application:
     name: config-server
 
-  profiles:
-    active: native
-
   cloud:
     config:
       server:
-        native:
-          search-locations: file:///C:/Users/thaku/smartcourier-config
+        git:
+          uri: https://github.com/Ritika-thakur-21/smartcourier-config.git
+          default-label: main
+          clone-on-start: true
 
 eureka:
   client:
@@ -21,11 +20,8 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
-  instance:
-    prefer-ip-address: true
-
 management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health,info
